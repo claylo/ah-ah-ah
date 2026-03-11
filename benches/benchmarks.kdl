@@ -1,0 +1,2 @@
+// Single source of truth for benchmark definitions.
+// Add benchmarks here and run `cargo xtask gen-benchmarks` to regenerate.

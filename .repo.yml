@@ -1,0 +1,43 @@
+# Changes here will be overwritten by Copier
+_commit: v1.0.0-beta.7-1-g31b88b9
+_src_path: .
+categories: []
+copyright_name: Clay Loveless
+copyright_year: '2026'
+edition: '2024'
+has_agents_md: true
+has_benchmarks: true
+has_claude: true
+has_cli: false
+has_coda: true
+has_community_files: false
+has_config: false
+has_core_library: true
+has_editorconfig: false
+has_env_files: false
+has_gitattributes: true
+has_github: true
+has_gungraun: false
+has_issue_templates: true
+has_md: true
+has_md_strict: false
+has_pr_templates: true
+has_releases: true
+has_roadmap_votes: false
+has_security_md: true
+has_site: false
+has_yamlfmt: false
+has_yamllint: false
+hook_system: none
+license:
+- Apache-2.0
+- MIT
+lint_level: strict
+msrv: 1.89.0
+owner: claylo
+pinned_dev_toolchain: 1.94.0
+preset: library
+project_description: "VUN token! TWO tokens! Count all the beautiful tokens ... offline! Ah-ah-ah!"
+project_name: ah-ah-ah
+site_deploy: github_pages
+site_package_manager: npm

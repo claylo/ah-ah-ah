@@ -1,0 +1,3 @@
+# Benchmark results directory
+# JSON and markdown reports from hyperfine, divan, and iai-callgrind
+# are saved here but not committed to version control.

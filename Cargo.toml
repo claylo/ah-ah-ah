@@ -1,0 +1,95 @@
+[package]
+name = "ah-ah-ah"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89.0"
+license = "Apache-2.0 OR MIT"
+readme = "README.md"
+repository = "https://github.com/claylo/ah-ah-ah"
+homepage = "https://github.com/claylo/ah-ah-ah"
+documentation = "https://docs.rs/ah-ah-ah"
+description = "VUN token! TWO tokens! Count all the beautiful tokens ... offline! Ah-ah-ah!"
+keywords = []
+categories = []
+exclude = [
+    "/.claude/",
+    "/.github/",
+    "/AGENTS.md",
+    "/.justfile",
+    "/.editorconfig",
+    "/.markdownlint.yaml",
+    "/.yamllint",
+    "/.envrc",
+    "/.env",
+    "/.env.rust",
+    "/bench-reports/",
+    "/scripts/",
+    "/docs/",
+    "/deny.toml",
+    "/*.example",
+]
+
+[dependencies]
+thiserror = "2.0"
+tracing = "0.1"
+
+[dev-dependencies]
+divan = "0.1"
+
+[lints.rust]
+# Use "deny" instead of "forbid" to allow benchmark harnesses to override
+# when their instrumentation machinery requires it
+unsafe_code = "deny"
+# Encourage documentation - warn on public items missing docs
+missing_docs = "warn"
+
+[lints.clippy]
+all = "warn"
+nursery = "warn"
+
+[[bench]]
+name = "divan_benchmarks"
+harness = false
+
+# Optimize dependencies in dev mode for faster tests
+# (keeps main crate unoptimized for fast incremental builds)
+[profile.dev.package."*"]
+debug = 0
+opt-level = 1
+
+[profile.dev.build-override]
+debug = 0
+opt-level = 1
+
+# Reduce debug info size (line tables only, no variable info)
+# Light optimization for better runtime without killing incremental builds
+[profile.dev]
+debug = "line-tables-only"
+opt-level = 1
+# On macOS, keep debug info from exploding into huge scattered dSYM trees
+split-debuginfo = "packed"
+codegen-units = 256
+
+# Test profile with full debug symbols for profiling
+[profile.test]
+inherits = "dev"
+codegen-units = 256
+debug = true
+
+# Release profile with reduced debug info
+[profile.release]
+debug = "line-tables-only"
+
+# Debug-friendly profile for investigating mysteries (hangs, crashes, etc.)
+# Usage: cargo build --profile mystery
+[profile.mystery]
+inherits = "release"
+opt-level = 1
+debug = true
+strip = false
+
+# Optimized profile for benchmarks
+[profile.bench]
+inherits = "release"
+lto = "thin"
+debug = "line-tables-only"
