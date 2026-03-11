@@ -1,13 +1,13 @@
-//! Error types for ah-ah-ah
+//! Error types for ah-ah-ah.
 
 use thiserror::Error;
 
-/// Errors that can occur in ah-ah-ah.
+/// Errors that can occur during token counting.
 #[derive(Error, Debug)]
 pub enum Error {
-    /// Placeholder variant (remove when adding real errors).
-    #[error("{0}")]
-    Other(String),
+    /// The embedded Claude vocabulary failed to parse.
+    #[error("failed to parse Claude vocabulary: {0}")]
+    VocabParse(#[from] serde_json::Error),
 }
 
 /// Result type alias using [`Error`].
