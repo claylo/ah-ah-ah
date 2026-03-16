@@ -70,6 +70,32 @@ impl MarkdownDecomposer {
         ranges
     }
 
+    /// Cheap check for a markdown table separator row.
+    ///
+    /// Scans for lines matching the pattern `|` followed by `-` (with optional
+    /// `:` for alignment), e.g. `|---|` or `| :--- |`. This avoids spinning up
+    /// the pulldown-cmark parser on source code that merely contains pipes.
+    fn has_table_separator(text: &str) -> bool {
+        for line in text.split('\n') {
+            let trimmed = line.trim();
+            // A separator row must start with `|` and contain at least `|-`
+            // or `|:-` (alignment colon before dashes).
+            if trimmed.starts_with('|') && trimmed.len() >= 3 {
+                // Check if the content after the first `|` is all separator
+                // characters: `-`, `:`, `|`, space, tab.
+                let rest = &trimmed[1..];
+                let has_dash = rest.contains('-');
+                let all_sep = rest
+                    .bytes()
+                    .all(|b| matches!(b, b'-' | b':' | b'|' | b' ' | b'\t'));
+                if has_dash && all_sep {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     /// Count tokens in a table fragment with cell-boundary awareness.
     ///
     /// Splits each line on `|`, counts each pipe as one token, and tokenizes
@@ -91,6 +117,13 @@ impl Decomposer for MarkdownDecomposer {
     fn count(&self, text: &str, raw_count: &dyn Fn(&str) -> usize) -> usize {
         // Fast path: no pipe character means no tables possible.
         if !text.contains('|') {
+            return raw_count(text);
+        }
+
+        // Cheap heuristic: a real markdown table requires a separator row
+        // containing `|` followed by dashes (optionally with colons for
+        // alignment). Without one, pipes are just code — skip the parser.
+        if !Self::has_table_separator(text) {
             return raw_count(text);
         }
 

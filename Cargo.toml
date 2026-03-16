@@ -9,11 +9,12 @@ repository = "https://github.com/claylo/ah-ah-ah"
 homepage = "https://github.com/claylo/ah-ah-ah"
 documentation = "https://docs.rs/ah-ah-ah"
 description = "VUN token! TWO tokens! Count all the beautiful tokens ... offline! Ah-ah-ah!"
-keywords = []
-categories = []
+keywords = ["tokenizer", "token-counting", "claude", "openai", "llm"]
+categories = ["text-processing", "algorithms"]
 exclude = [
     "/.claude/",
     "/.github/",
+    "/.handoffs/",
     "/AGENTS.md",
     "/.justfile",
     "/.editorconfig",
@@ -26,6 +27,9 @@ exclude = [
     "/scripts/",
     "/docs/",
     "/deny.toml",
+    "/no-plugins/",
+    "/scratch/",
+    "/tests/fixtures/",
     "/*.example",
 ]
 
