@@ -10,7 +10,7 @@ Offline token counting for Claude and OpenAI models. No API calls, no network, n
 > *VUN token! TWO tokens! Count all the beautiful tokens ... offline! Ah-ah-ah!*
 
 <center>
-![](assets/vun-token-sm.jpg)
+![vun-token-sm](assets/vun-token-sm.jpg)
 </center>
 
 ## Quick start
