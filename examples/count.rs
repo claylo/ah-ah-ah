@@ -2,7 +2,7 @@
 
 use std::io::Read;
 
-use ah_ah_ah::{count_tokens, Backend};
+use ah_ah_ah::{Backend, count_tokens};
 
 fn main() {
     let mut input = String::new();

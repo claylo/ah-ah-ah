@@ -21,6 +21,17 @@ impl Backend {
             Self::Openai => "openai",
         }
     }
+
+    /// Whether this backend produces exact token counts.
+    ///
+    /// Exact backends (like OpenAI's BPE) don't benefit from decomposition
+    /// and should bypass it to preserve count accuracy.
+    pub const fn is_exact(&self) -> bool {
+        match self {
+            Self::Claude => false,
+            Self::Openai => true,
+        }
+    }
 }
 
 impl std::fmt::Display for Backend {

@@ -43,7 +43,19 @@ pub fn count_tokens(
         Backend::Openai => openai::count,
     };
 
-    let count = decomposer.map_or_else(|| raw_count(text), |d| d.count(text, &raw_count));
+    // Exact backends (BPE) don't benefit from decomposition — applying one
+    // would break cell contents into segments that tokenize differently,
+    // violating the exactness guarantee.
+    let effective_decomposer = if backend.is_exact() {
+        if decomposer.is_some() {
+            tracing::debug!("skipping decomposer for exact backend {backend}");
+        }
+        None
+    } else {
+        decomposer
+    };
+
+    let count = effective_decomposer.map_or_else(|| raw_count(text), |d| d.count(text, &raw_count));
 
     let over_budget = budget.is_some_and(|max| count > max);
 
