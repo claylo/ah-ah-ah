@@ -18,7 +18,7 @@ Offline token counting for Claude and OpenAI models. No API calls, no network, n
 ## Quick start
 
 ```rust
-use ah_ah_ah::{count_tokens, Backend, MarkdownDecomposer};
+use ah_ah_ah::{Backend, MarkdownDecomposer, count_tokens};
 
 // Raw counting.
 let report = count_tokens("Hello, world!", None, Backend::Claude, None);
@@ -42,7 +42,7 @@ Greedy longest-match tokenizer built from 38,360 API-verified Claude 3+ token
 strings, using an Aho-Corasick automaton. The vocabulary was reverse-engineered
 by probing the Anthropic `count_tokens` API ~485,000 times (see
 [ctoc](https://github.com/nichochar/ctoc) and the vocabulary recovery work in
-the fork that produced this dataset).
+[the fork that produced this dataset](https://github.com/claylo/ctoc/tree/extended-vocab)).
 
 **No merge table** — just greedy leftmost-longest matching. This is surprisingly
 effective: BPE's merge rules tend to produce tokens that are also the longest
@@ -121,7 +121,7 @@ the parser entirely for content without table separator rows (`|---|`), so sourc
 code with pipes (match arms, closures, shell pipes) doesn't pay the parsing cost.
 
 ```rust
-use ah_ah_ah::{count_tokens, Backend, Decomposer};
+use ah_ah_ah::{Backend, Decomposer, count_tokens};
 
 // Custom decomposer example.
 struct CsvDecomposer;
