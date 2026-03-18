@@ -45,12 +45,14 @@ jobs:
           tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "tag=${tag}" >> $GITHUB_OUTPUT
 
+      - name: Install git-cliff
+        uses: ./.github/actions/setup-cargo-tools
+        with:
+          binstall-tools: git-cliff
+
       - name: Check for releasable commits
         id: check
         run: |
-          # Install git-cliff
-          cargo install git-cliff
-
           # Get the bumped version from git-cliff
           next_version=$(git cliff --bumped-version 2>/dev/null || echo "")
 
