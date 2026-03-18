@@ -10,5 +10,5 @@ pub enum Error {
     VocabParse(#[from] serde_json::Error),
 }
 
-/// Result type alias using [`Error`].
+/// Result type alias using [`enum@Error`].
 pub type Result<T> = std::result::Result<T, Error>;

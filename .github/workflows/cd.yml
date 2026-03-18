@@ -38,10 +38,46 @@ jobs:
           config: cliff.toml
           args: -vv --latest --no-exec --github-repo ${{ github.repository }}
 
+  verify:
+    name: Verify before publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Rust toolchain
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
+        with:
+          toolchain: stable
+          components: clippy
+
+      - name: Rust cache
+        uses: ./.github/actions/setup-rust-cache
+        with:
+          cache-key-suffix: cd-verify
+          toolchain: stable
+
+      - name: clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Install nextest
+        uses: ./.github/actions/setup-cargo-tools
+        with:
+          binstall-tools: cargo-nextest
+
+      - name: nextest
+        run: cargo nextest run --profile ci
+
+      - name: doctests
+        run: cargo test --doc
+
+      - name: Dry-run publish
+        run: cargo publish --dry-run --locked
+
   publish-crates-io:
     name: Publish to crates.io
     if: ${{ !contains(github.ref, '-') && vars.CRATES_IO_ENABLED == 'true' }}
-    needs: [generate-changelog]
+    needs: [generate-changelog, verify]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
