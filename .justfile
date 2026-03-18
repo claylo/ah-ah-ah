@@ -93,9 +93,9 @@ fmt:
 clippy:
   cargo +{{toolchain}} clippy --all-targets --all-features --message-format=short -- -D warnings
 
-fix:
+fix: fmt
   echo "Using toolchain {{toolchain}}"
-  cargo +{{toolchain}} clippy --fix --allow-dirty --allow-staged -- -W clippy::all
+  cargo +{{toolchain}} clippy --fix --all-targets --all-features --allow-dirty --allow-staged -- -W clippy::all
 
 # Check dependencies for security advisories and license compliance
 deny:

@@ -1,6 +1,6 @@
 #![allow(missing_docs)]
 
-use ah_ah_ah::{count_tokens, Backend, Decomposer, MarkdownDecomposer};
+use ah_ah_ah::{Backend, Decomposer, MarkdownDecomposer, count_tokens};
 
 #[test]
 fn claude_backend_counts_tokens() {
