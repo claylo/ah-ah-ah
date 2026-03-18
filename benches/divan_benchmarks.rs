@@ -5,7 +5,7 @@
 
 #![allow(missing_docs)]
 
-use ah_ah_ah::{count_tokens, Backend, MarkdownDecomposer};
+use ah_ah_ah::{Backend, MarkdownDecomposer, count_tokens};
 
 fn main() {
     divan::main();

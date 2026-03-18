@@ -1,0 +1,56 @@
+name: CD
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  id-token: write      # Sigstore OIDC for attestations
+  attestations: write  # Persist attestations
+
+env:
+  CARGO_TERM_COLOR: always
+  PROJECT_NAME: ah-ah-ah
+
+jobs:
+  generate-changelog:
+    name: Generate changelog
+    runs-on: ubuntu-latest
+    outputs:
+      release_body: ${{ steps.git-cliff.outputs.content }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Extract version
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@c93ef52f3d0ddcdcc9bd5447d98d458a11cd4f72 # v4.7.1
+        id: git-cliff
+        with:
+          config: cliff.toml
+          args: -vv --latest --no-exec --github-repo ${{ github.repository }}
+
+  publish-crates-io:
+    name: Publish to crates.io
+    if: ${{ !contains(github.ref, '-') && vars.CRATES_IO_ENABLED == 'true' }}
+    needs: [generate-changelog]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Rust toolchain
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
+        with:
+          toolchain: stable
+
+      - name: Publish
+        run: cargo publish --locked --token ${{ secrets.CARGO_TOKEN }}

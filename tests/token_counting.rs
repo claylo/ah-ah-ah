@@ -1,6 +1,6 @@
 #![allow(missing_docs)]
 
-use ah_ah_ah::{count_tokens, Backend, Decomposer, MarkdownDecomposer};
+use ah_ah_ah::{Backend, Decomposer, MarkdownDecomposer, count_tokens};
 
 #[test]
 fn claude_backend_counts_tokens() {
@@ -274,6 +274,48 @@ items.iter()
 }
 
 // ---------------------------------------------------------------------------
+// Tables without leading pipe (Finding 1 regression tests)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn table_without_leading_pipe_detected() {
+    // pulldown-cmark accepts this as a valid pipe table.
+    // The key assertion: decomposition IS applied (counts differ from raw),
+    // meaning the heuristic correctly recognizes this as a table.
+    let text = "Name | Age\n----|-----\nAlice | 30\nBob | 25\n";
+    let md = MarkdownDecomposer;
+    let raw = count_tokens(text, None, Backend::Claude, None);
+    let aware = count_tokens(text, None, Backend::Claude, Some(&md));
+    assert_ne!(
+        aware.count, raw.count,
+        "table without leading pipe should trigger decomposition (raw={}, aware={})",
+        raw.count, aware.count
+    );
+}
+
+#[test]
+fn table_without_outer_pipes_mixed_with_prose() {
+    let text = "Some intro text.\n\nHeader A | Header B\n---------|--------\nfoo | bar\n\nSome trailing text.";
+    let md = MarkdownDecomposer;
+    let aware = count_tokens(text, None, Backend::Claude, Some(&md));
+    assert!(aware.count > 0, "should produce a positive count");
+}
+
+#[test]
+fn separator_with_alignment_no_leading_pipe() {
+    let text = "Left | Center | Right\n:-----|:------:|------:\na | b | c\n";
+    let md = MarkdownDecomposer;
+    let raw = count_tokens(text, None, Backend::Claude, None);
+    let aware = count_tokens(text, None, Backend::Claude, Some(&md));
+    assert!(
+        aware.count >= raw.count,
+        "aligned table without leading pipe: aware ({}) should be >= raw ({})",
+        aware.count,
+        raw.count
+    );
+}
+
+// ---------------------------------------------------------------------------
 // Unicode and special characters
 // ---------------------------------------------------------------------------
 
@@ -516,18 +558,26 @@ fn deterministic_counting() {
 }
 
 // ---------------------------------------------------------------------------
-// OpenAI backend with decomposer
+// OpenAI backend ignores decomposer (exact BPE guarantee)
 // ---------------------------------------------------------------------------
 
 #[test]
-fn openai_decomposer_table() {
+fn openai_ignores_decomposer() {
     let table = "| A | B |\n|---|---|\n| 1 | 2 |\n";
     let md = MarkdownDecomposer;
     let raw = count_tokens(table, None, Backend::Openai, None);
-    let aware = count_tokens(table, None, Backend::Openai, Some(&md));
-    // BPE is exact, but decomposition may produce different token boundaries.
-    assert!(aware.count > 0);
-    assert!(raw.count > 0);
+    let with_decomposer = count_tokens(table, None, Backend::Openai, Some(&md));
+    assert_eq!(
+        raw.count, with_decomposer.count,
+        "OpenAI counts must be identical with or without decomposer (raw={}, decomposed={})",
+        raw.count, with_decomposer.count
+    );
+}
+
+#[test]
+fn openai_exact_flag() {
+    assert!(Backend::Openai.is_exact());
+    assert!(!Backend::Claude.is_exact());
 }
 
 #[test]

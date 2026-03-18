@@ -72,23 +72,20 @@ impl MarkdownDecomposer {
 
     /// Cheap check for a markdown table separator row.
     ///
-    /// Scans for lines matching the pattern `|` followed by `-` (with optional
-    /// `:` for alignment), e.g. `|---|` or `| :--- |`. This avoids spinning up
-    /// the pulldown-cmark parser on source code that merely contains pipes.
+    /// Scans for lines that look like table separators: composed entirely of
+    /// `-`, `:`, `|`, space, and tab, with at least one dash and one pipe.
+    /// Matches both `|---|---|` and `----|-----` (no leading pipe) forms, since
+    /// `pulldown-cmark` accepts both.
     fn has_table_separator(text: &str) -> bool {
         for line in text.split('\n') {
             let trimmed = line.trim();
-            // A separator row must start with `|` and contain at least `|-`
-            // or `|:-` (alignment colon before dashes).
-            if trimmed.starts_with('|') && trimmed.len() >= 3 {
-                // Check if the content after the first `|` is all separator
-                // characters: `-`, `:`, `|`, space, tab.
-                let rest = &trimmed[1..];
-                let has_dash = rest.contains('-');
-                let all_sep = rest
+            if trimmed.len() >= 3 {
+                let has_dash = trimmed.contains('-');
+                let has_pipe = trimmed.contains('|');
+                let all_sep = trimmed
                     .bytes()
                     .all(|b| matches!(b, b'-' | b':' | b'|' | b' ' | b'\t'));
-                if has_dash && all_sep {
+                if has_dash && has_pipe && all_sep {
                     return true;
                 }
             }
