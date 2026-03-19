@@ -69,3 +69,4 @@ tests/fixtures/*.json
 !tests/fixtures/.gitkeep
 
 .claude/projects
+dist/
