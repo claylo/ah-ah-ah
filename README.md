@@ -11,7 +11,7 @@ Offline token counting for Claude and OpenAI models. No API calls, no network, n
 
 <div align="center">
 
-![ah-ah-ah](assets/vun-token-sm.jpg)
+![ah-ah-ah](https://raw.githubusercontent.com/claylo/ah-ah-ah/main/assets/vun-token-sm.jpg)
 
 </div>
 
